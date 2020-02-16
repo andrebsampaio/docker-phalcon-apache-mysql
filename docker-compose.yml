@@ -7,11 +7,12 @@ services:
         volumes:
             - /Users/work/Desktop/Vormats/vormats_web_wl/www:/var/www/html/
         links:
-            - db
+            - db:db
         networks:
             - default
     db:
         image: mysql
+        command: --default-authentication-plugin=mysql_native_password
         ports:
             - "3306:3306"
         environment:
