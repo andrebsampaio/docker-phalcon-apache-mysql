@@ -9,6 +9,22 @@ ARG PHALCON_EXT_PATH=php7/64bits
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN docker-php-ext-install pdo pdo_mysql mysqli
+RUN apt-get install -y \
+libfreetype6-dev libjpeg62-turbo-dev \
+libgd-dev libpng-dev
+RUN docker-php-ext-configure gd \
+--with-freetype-dir=/usr/include/ \
+--with-jpeg-dir=/usr/include/
+RUN docker-php-ext-install gd
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
+ADD ssl.conf /etc/apache2/sites-available/ssl.conf
+ADD entrypoint.sh /opt/entrypoint.sh
+
+RUN chmod a+x /opt/entrypoint.sh
+RUN /bin/bash -c "source /opt/entrypoint.sh /etc/apache2/ssl_keys localhost"
+RUN a2enmod ssl
+RUN a2ensite ssl
 RUN a2enmod rewrite
 
 RUN set -xe && \
